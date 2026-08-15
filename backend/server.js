@@ -20,10 +20,14 @@ app.get('/api/health', (req, res) => {
 // Main endpoint the frontend calls with the user's prompt
 app.post('/api/chat', async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { prompt, systemPrompt } = req.body;
 
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
       return res.status(400).json({ error: 'A non-empty "prompt" string is required.' });
+    }
+
+    if (systemPrompt !== undefined && typeof systemPrompt !== 'string') {
+      return res.status(400).json({ error: '"systemPrompt", if provided, must be a string.' });
     }
 
     if (!GROQ_API_KEY) {
@@ -31,6 +35,12 @@ app.post('/api/chat', async (req, res) => {
         error: 'Server is missing GROQ_API_KEY. Add it to backend/.env and restart the server.',
       });
     }
+
+    const messages = [];
+    if (systemPrompt && systemPrompt.trim()) {
+      messages.push({ role: 'system', content: systemPrompt });
+    }
+    messages.push({ role: 'user', content: prompt });
 
     const groqResponse = await fetch(GROQ_API_URL, {
       method: 'POST',
@@ -40,7 +50,7 @@ app.post('/api/chat', async (req, res) => {
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
-        messages: [{ role: 'user', content: prompt }],
+        messages,
       }),
     });
 

@@ -32,7 +32,7 @@ npm run dev
 ```
 
 It runs on **http://localhost:5000** and exposes:
-- `POST /api/chat` — body `{ "prompt": "..." }`, returns `{ "reply": "..." }`
+- `POST /api/chat` — body `{ "prompt": "...", "systemPrompt": "..." }` (`systemPrompt` is optional), returns `{ "reply": "..." }`
 - `GET /api/health` — quick check that the server (and key) are configured
 
 ## 2. Frontend setup
