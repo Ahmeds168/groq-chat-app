@@ -40,6 +40,7 @@ export default function App() {
 
   return (
     <div style={styles.page}>
+      <style>{keyframes}</style>
       <div style={styles.card}>
         <h1 style={styles.title}>Groq Chat</h1>
         <p style={styles.subtitle}>
@@ -57,6 +58,7 @@ export default function App() {
             onChange={(e) => setSystemPrompt(e.target.value)}
             placeholder="e.g. You are a concise, friendly assistant that answers in bullet points."
             rows={3}
+            disabled={loading}
           />
 
           <label style={styles.label} htmlFor="userPrompt">
@@ -69,12 +71,24 @@ export default function App() {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Ask Groq anything..."
             rows={5}
+            disabled={loading}
           />
 
           <button type="submit" style={styles.button} disabled={loading}>
             {loading ? 'Sending...' : 'Send'}
           </button>
         </form>
+
+        {loading && (
+          <div style={styles.progressWrap} role="status" aria-live="polite">
+            <div style={styles.progressTrack}>
+              <div style={styles.progressBar} />
+            </div>
+            <p style={styles.progressText}>
+              Waiting on Groq... this can take up to a minute if the server was idle.
+            </p>
+          </div>
+        )}
 
         {error && <div style={styles.error}>{error}</div>}
 
@@ -88,6 +102,14 @@ export default function App() {
     </div>
   );
 }
+
+const keyframes = `
+@keyframes indeterminate {
+  0% { left: -40%; width: 40%; }
+  50% { width: 60%; }
+  100% { left: 100%; width: 40%; }
+}
+`;
 
 const styles = {
   page: {
@@ -140,6 +162,30 @@ const styles = {
     fontSize: 15,
     fontWeight: 600,
     cursor: 'pointer',
+  },
+  progressWrap: {
+    marginTop: 20,
+  },
+  progressTrack: {
+    position: 'relative',
+    height: 6,
+    borderRadius: 999,
+    background: '#334155',
+    overflow: 'hidden',
+  },
+  progressBar: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    background: '#6366f1',
+    borderRadius: 999,
+    animation: 'indeterminate 1.2s ease-in-out infinite',
+  },
+  progressText: {
+    color: '#94a3b8',
+    fontSize: 13,
+    marginTop: 8,
+    marginBottom: 0,
   },
   error: {
     marginTop: 16,
